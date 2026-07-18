@@ -6,6 +6,8 @@
 
 ## 증상 → 처방 지도
 
+증상을 먼저 확인하고 처방하라. **증상 없는 최적화는 복잡도만 산다** (특히 memo). 아래 지도가 증상→처방의 대응이다.
+
 ```mermaid
 graph TB
   S1["첫 로드 JS가 크다<br/>(js-eval·hydrated 늦음)"] --> P1["코드 분할<br/>(code splitting / React.lazy)"]
@@ -15,11 +17,9 @@ graph TB
   S5["스피너가 연달아 계단식으로 뜬다<br/>(fetch-N-done 계단)"] --> P5["요청 워터폴 제거<br/>(병렬화·호이스팅)"]
 ```
 
-증상을 먼저 확인하고 처방하라. **증상 없는 최적화는 복잡도만 산다** (특히 memo).
-
 ## 1. 코드 분할 (Code Splitting)
 
-첫 화면에 필요 없는 코드(모달, 에디터, 차트, 관리자 화면)를 `import()` 경계로 분리해 필요할 때 로드한다. `js-eval`이 앞당겨지고, SSR 앱이라면 [hydration](./07-hydration.md) 시작도 빨라진다.
+첫 화면에 필요 없는 코드(모달, 에디터, 차트, 관리자 화면)를 `import()` 경계로 분리해 필요할 때 로드한다. 초기 번들에서 그만큼 바이트가 빠지므로 다운로드·파싱·평가량이 함께 줄어 `js-eval`이 앞당겨지고, SSR 앱이라면 [hydration](./07-hydration.md)은 번들 평가가 끝나야 시작할 수 있으므로 그 시작점도 같이 당겨진다.
 
 - **데모**: [bundle-as-is.html](http://localhost:3002/bundle-as-is.html) (전부 한 번들) vs [bundle-to-be.html](http://localhost:3002/bundle-to-be.html) (초기 화면만 먼저)
 - **확인할 것**: DevTools Network의 JS 전송량과 HUD `js-eval`·`hydrated`. `editor-requested`→`editor-ready` 같은 데모 고유 단계로 "지연 로드된 조각이 준비되는 시점"을 볼 것. slow3g 스로틀에서 차이가 증폭된다.
@@ -41,11 +41,11 @@ graph TB
 
 - **데모**: [memo/as-is](http://localhost:3002/#/memo/as-is) (키 입력 하나·카드 클릭 한 번에 카드 500장이 전부 리렌더) vs [to-be](http://localhost:3002/#/memo/to-be)
 - **확인할 것**: 화면의 "이번 입력으로 리렌더된 카드 수"(as-is는 매번 500)와 상호작용 시 `long-tasks`·`worst-interaction`. React DevTools Profiler로 리렌더 범위 시각화도 병행 추천.
-- **함정**: 인라인 객체/함수 props가 memo를 무효화한다. 그리고 React Compiler가 이 최적화를 자동화하는 방향이므로, 수동 memo는 "측정으로 확인된 병목"에만.
+- **함정**: 인라인 객체/함수 props가 memo를 무효화한다 — 인라인 객체/함수는 렌더마다 새 참조로 만들어지는데 memo는 props를 얕은 비교(`Object.is`)로 판정하므로, 비교가 매번 실패해 리렌더를 건너뛰지 못한다. `useMemo`/`useCallback`으로 참조를 고정해야 memo가 실제로 동작한다. 그리고 React Compiler가 이 최적화를 자동화하는 방향이므로, 수동 memo는 "측정으로 확인된 병목"에만.
 
 ## 4. 리스트 가상화 (Virtualization)
 
-화면에 보이는 행만 DOM으로 만든다. 수천 행의 DOM 생성·레이아웃 비용과 메모리를 없앤다.
+화면에 보이는 행만 DOM으로 만든다. 브라우저의 스타일 계산·레이아웃 비용은 DOM 노드 수에 비례하므로, 보이는 행만 만들면 그 비용이 전체 행 수와 무관한 상수가 된다 — 10,000행짜리 목록이어도 화면에 20행이면 20행 값만 낸다. 수천 행 분량의 DOM 생성 비용과 메모리도 함께 사라진다.
 
 - **데모**: [virtual/as-is](http://localhost:3002/#/virtual/as-is) (스터디스페이스 10,000행 전부 렌더 — 행당 노드 5개, 총 5만 노드 이상) vs [to-be](http://localhost:3002/#/virtual/to-be)
 - **확인할 것**: 초기 `content-rendered`까지의 시간과 `long-tasks`. as-is는 DOM이 스냅샷 한도 6,000 노드를 훌쩍 넘겨 목록 커밋 이후 **HUD 스냅샷이 생략**된다(📷 없음 — 그 자체가 "DOM이 너무 크다"는 신호다, [PERF_API](../PERF_API.md) 참고).
@@ -56,7 +56,7 @@ graph TB
 컴포넌트가 렌더된 뒤에야 그 자식의 fetch가 시작되는 구조(fetch-on-render)는 지연을 **직렬로 합산**한다. 요청을 라우트 레벨로 끌어올리거나(hoisting) `Promise.all`로 병렬화한다.
 
 - **데모**: [waterfall/as-is](http://localhost:3002/#/waterfall/as-is) (3개 지역 목록을 직렬 `await`로 순차 fetch — 마운트 후에야 첫 요청 시작) vs [to-be](http://localhost:3002/#/waterfall/to-be) (`Promise.all` 병렬 + 라우트 청크 로드 시점에 요청 선시작)
-- **확인할 것**: HUD에서 `fetch-1-done`→`fetch-2-done`→`fetch-3-done`이 as-is는 계단(직렬), to-be는 거의 같은 시각에 몰려 있음. `data-requested`가 as-is는 `hydrated` **뒤**(렌더를 기다렸다 요청), to-be는 **앞**(render-as-you-fetch)에 찍히는 것도 볼 것. `?apiDelay=800`이면 as-is의 `all-done`은 지연×3만큼 밀린다.
+- **확인할 것**: HUD에서 `fetch-1-done`→`fetch-2-done`→`fetch-3-done`이 as-is는 계단(직렬), to-be는 거의 같은 시각에 몰려 있음. `data-requested`가 as-is는 `hydrated` **뒤**(렌더를 기다렸다 요청), to-be는 **앞**에 찍히는 것도 볼 것 — to-be는 렌더를 기다리지 않고 라우트 청크 로드 시점에 요청부터 시작하기 때문이다(render-as-you-fetch — "페치를 먼저 걸어 두고 렌더는 병행", fetch-on-render의 반대). `?apiDelay=800`이면 as-is의 `all-done`은 지연×3만큼 밀린다.
 - **함정**: 이 문제의 프레임워크 레벨 해법이 바로 라우트 loader([09](./09-selective-ssr-and-router-caching.md))와 서버 컴포넌트의 데이터 소유([06](./06-rsc.md))다 — 같은 원리가 계층만 바꿔 반복된다.
 
 ## 관련 데모 (모음)

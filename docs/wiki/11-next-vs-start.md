@@ -6,6 +6,8 @@
 
 ## 철학 비교
 
+두 프레임워크는 기본값의 무게중심이 정반대다 — Next는 서버가 기본이고 클라이언트가 opt-in(`'use client'`), Start는 클라이언트 SPA가 기본이고 서버가 opt-in(`ssr` 옵션·server function)이다. 아래 그림이 그 대칭 구조다.
+
 ```mermaid
 graph TB
   subgraph next["Next.js — 서버 우선 (server-first)"]

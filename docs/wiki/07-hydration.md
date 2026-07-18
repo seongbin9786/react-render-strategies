@@ -6,6 +6,8 @@
 
 ## 무슨 일이 일어나는가
 
+hydration은 사실상 초기 렌더를 클라이언트에서 한 번 더 하는 것이다 — 번들 전체가 도착해야 시작할 수 있고, 큰 트리에서는 그 자체가 하나의 long task가 되기 쉽다.
+
 ```mermaid
 sequenceDiagram
     participant B as 브라우저
@@ -22,22 +24,22 @@ sequenceDiagram
 
 hydration이 비싼 이유:
 
-1. **렌더를 한 번 더 한다.** 서버가 이미 그린 화면인데, React는 이벤트를 붙일 대상을 알기 위해 같은 트리를 클라이언트에서 다시 계산해야 한다. CPU 비용은 CSR의 초기 렌더와 크게 다르지 않다.
+1. **렌더를 한 번 더 한다.** 서버가 이미 그린 화면인데 왜 다시 계산해야 하나 — HTML은 렌더의 "결과물"만 담을 뿐, 이벤트 핸들러(함수·클로저)와 state는 직렬화해 실어 보낼 수 없기 때문이다. 이후 상호작용에 반응해 다시 렌더하려면 메모리에 살아 있는 컴포넌트 트리가 필요하고, 그것은 컴포넌트 함수를 클라이언트에서 다시 실행해야만 만들어진다. 그래서 CPU 비용은 CSR의 초기 렌더와 크게 다르지 않다.
 2. **번들 전체가 필요하다.** 트리를 재구성하려면 모든 컴포넌트 코드가 있어야 한다. 즉 hydration 시작 시점은 번들 크기에 종속된다.
-3. **동기적이고 길다.** 큰 트리의 hydration은 하나의 long task가 되기 쉽다. `long-tasks` 단계가 `hydrated` 직전에 튀는 이유.
+3. **동기적이고 길다.** 경계 없이 하나로 이어진 트리는 hydration을 중간에 끊고 메인 스레드를 양보할 지점이 없어, 큰 트리의 hydration은 전체가 하나의 long task가 되기 쉽다 — `long-tasks` 단계가 `hydrated` 직전에 튀는 이유다. (양보 지점을 만들어 주는 것이 아래 완화책의 Suspense 경계다.)
 
-재렌더에 쓰이는 데이터는 다시 fetch하는 것이 아니다. 서버가 렌더에 사용한 데이터를 HTML에 함께 직렬화해 내려보내고(Next의 RSC payload, Start의 dehydrated loader 데이터), 클라이언트는 그것을 재사용해 같은 트리를 재현한다 — mismatch가 나지 않는 이유이자, **payload 크기도 hydration 비용에 포함되는** 이유다. 직렬화 구조는 [06. RSC](./06-rsc.md) 참고.
+재렌더에 쓰이는 데이터는 다시 fetch하는 것이 아니다. 서버가 렌더에 사용한 데이터를 HTML에 함께 직렬화해 내려보내고 — Next는 이 직렬화 결과를 RSC payload([06](./06-rsc.md))로, Start는 라우트 데이터 함수인 loader의 결과([09](./09-selective-ssr-and-router-caching.md))로 싣는다 — 클라이언트는 그것을 재사용해 같은 트리를 재현한다 — mismatch가 나지 않는 이유이자, **payload 크기도 hydration 비용에 포함되는** 이유다. 직렬화 구조는 [06. RSC](./06-rsc.md) 참고.
 
 ## Uncanny valley — 보이는데 안 되는 구간
 
-`fcp`(또는 `lcp`) ~ `hydrated` 사이, 화면은 완성돼 보이지만 무반응인 구간. 느린 회선일수록 이 구간이 길어지고, 사용자는 "빨리 뜨는데 버벅이는 사이트"라고 느낀다. **SSR의 체감 품질은 FCP가 아니라 이 구간의 길이로 결정되는 경우가 많다.**
+**SSR의 체감 품질은 FCP가 아니라 `fcp`(또는 `lcp`) ~ `hydrated` 구간의 길이로 결정되는 경우가 많다** — 화면은 완성돼 보이지만 무반응인 이 구간이 uncanny valley다. 느린 회선일수록 번들 다운로드가 늘어져 구간이 길어지고, 사용자는 "빨리 뜨는데 버벅이는 사이트"라고 느낀다.
 
 ## React 18+의 완화책: 선택적 hydration (Selective Hydration)
 
-Suspense 경계로 나뉜 트리는 **경계 단위로 따로** hydrate된다.
+Suspense는 아직 준비되지 않은 하위 트리 자리에 대체 UI(fallback)를 먼저 그리게 하는 React 컴포넌트로 트리를 "경계(boundary)" 단위로 구획하는데, React 18+는 이 경계 단위로 hydration도 **따로** 수행한다(경계의 정식 정의와 스트리밍과의 관계는 [05. Streaming SSR](./05-streaming-ssr.md)). 경계마다 끊어 hydrate하면 경계 사이가 메인 스레드를 양보하는 지점이 되므로, 위의 "하나의 long task" 문제가 여기서 완화된다.
 
-- 스트리밍으로 늦게 도착한 섹션은 도착한 것부터 hydrate.
-- 사용자가 아직 hydrate 안 된 영역을 클릭하면 **그 영역을 우선** hydrate (이벤트 리플레이).
+- 스트리밍(서버가 HTML을 한 응답 안에서 청크로 나눠 순차 전송하는 것 — [05](./05-streaming-ssr.md))으로 늦게 도착한 섹션은 도착한 것부터 hydrate.
+- 사용자가 아직 hydrate 안 된 영역을 클릭하면 **그 영역을 우선** hydrate한다 — React가 `hydrateRoot` 시점에 루트 컨테이너에 위임 리스너를 먼저 붙여 두므로 핸들러가 아직 없는 영역의 클릭도 감지할 수 있다. 클릭 같은 discrete 이벤트는 큐에 넣지 않고 **그 자리에서 동기적으로** 해당 경계의 hydration을 시도해, 성공하면 같은 이벤트 처리 안에서 핸들러까지 실행하고, 아직 불가능하면(코드·HTML 미도착) 그 클릭은 버리되 경계의 hydration 우선순위만 끌어올린다. 큐에 보관했다가 hydration 후 재발화하는 **이벤트 리플레이**는 mouseover·pointerover·focusin 같은 연속(continuous) 이벤트에만 적용된다 — discrete 이벤트 리플레이는 React 18 정식 출시 전에 제거됐다(연발 클릭을 한참 뒤에 몰아서 재생하는 위험 때문).
 
 즉 [05. Streaming SSR](./05-streaming-ssr.md)의 Suspense 경계는 HTML 도착 순서뿐 아니라 hydration 순서도 쪼갠다. 이 축의 극단이 [10. Islands와 Resumability](./10-ppr-islands-resumability.md)(hydrate할 영역 자체를 줄이거나, hydration을 아예 없애기)다.
 
@@ -53,7 +55,7 @@ Suspense 경계로 나뉜 트리는 **경계 단위로 따로** hydrate된다.
 | 데모 | URL | 확인할 것 |
 |---|---|---|
 | 모든 SSR 데모의 `hydrated` | [http://localhost:3000/csr-vs-ssr/to-be](http://localhost:3000/csr-vs-ssr/to-be) | `fcp`~`hydrated` 간격. DevTools `Slow 3G`를 걸면 간격이 극적으로 벌어짐. 그 사이에 버튼을 클릭해 볼 것 |
-| SSR 유무에 따른 hydration | [http://localhost:3001/selective-ssr/full](http://localhost:3001/selective-ssr/full) vs [/spa](http://localhost:3001/selective-ssr/spa) | full은 `fcp`에 이미 콘텐츠가 있지만 `ttfb`가 loader(400ms+apiDelay)에 볼모라 `fcp` 자체는 늦음. spa는 `ttfb`·`fcp`는 즉시(셸)지만 라우트 콘텐츠가 hydration 후 클라이언트에서 렌더되어 가장 늦음. spa도 셸 hydration은 있어 `hydrated`가 찍힌다 — 사라지는 것은 라우트 콘텐츠의 hydration뿐 (모드 의미는 [09](./09-selective-ssr-and-router-caching.md) 참고) |
+| SSR 유무에 따른 hydration | [http://localhost:3001/selective-ssr/full](http://localhost:3001/selective-ssr/full) vs [/spa](http://localhost:3001/selective-ssr/spa) | full은 `fcp`에 이미 콘텐츠가 있지만 `ttfb`가 loader(라우트 진입 전에 데이터를 준비하는 Start의 함수 — 여기서는 400ms+apiDelay)에 볼모라 `fcp` 자체는 늦음. spa는 `ttfb`·`fcp`는 즉시(셸)지만 라우트 콘텐츠가 hydration 후 클라이언트에서 렌더되어 가장 늦음. spa도 셸 hydration은 있어 `hydrated`가 찍힌다 — 사라지는 것은 라우트 콘텐츠의 hydration뿐 (모드 의미는 [09](./09-selective-ssr-and-router-caching.md) 참고) |
 | 번들 크기 → hydration | [http://localhost:3002/bundle-as-is.html](http://localhost:3002/bundle-as-is.html) vs [/bundle-to-be.html](http://localhost:3002/bundle-to-be.html) | `js-eval`→`hydrated`가 번들 크기에 어떻게 종속되는지 (react-lab은 CSR이라 여기서 `hydrated`는 mount 완료 — 번들 크기가 상호작용 가능 시점을 미루는 구조는 동일) |
 | 스트리밍 + 선택적 hydration | [http://localhost:3000/blocking-vs-streaming/to-be](http://localhost:3000/blocking-vs-streaming/to-be) | `stream:section-N`(HTML 파서 도달 — hydration 이전)과 `hydrated`(hydration 완료)의 시차 |
 

@@ -1,6 +1,6 @@
 # 09. Selective SSR과 라우터 캐싱 — TanStack Start 고유 기능
 
-> **한 줄 요약**: Start는 라우트마다 SSR 정도를 3단계(`ssr: true / 'data-only' / false`)로 고를 수 있고, 라우터 캐시(`staleTime`)와 의도 기반 프리로드(`preload: 'intent'`)로 SPA 내비게이션을 체감 0ms에 가깝게 만든다.
+> **한 줄 요약**: Start는 라우트마다 SSR 정도를 3단계(`ssr: true / 'data-only' / false`)로 고를 수 있고, 라우터 캐시(`staleTime`)와 의도 기반 프리로드(`preload: 'intent'`)로 SPA 내비게이션을 체감 0ms에 가깝게 만든다 — 대가는 신선도와 서버 부하다: staleTime을 늘릴수록 낡은 데이터를 보여줄 위험이, 프리로드를 켤수록 클릭되지 않을 링크의 loader 실행이 늘어난다.
 >
 > **선행 문서**: [03. SSR](./03-ssr.md), [07. Hydration](./07-hydration.md)
 

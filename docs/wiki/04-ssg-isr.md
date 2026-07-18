@@ -6,6 +6,8 @@
 
 ## 동작 원리
 
+렌더를 빌드 타임으로 옮기면 요청 시점에는 파일 서빙만 남는다 — TTFB에서 서버 렌더와 데이터 페치 항이 통째로 사라지는 대신, 화면은 빌드 시점의 데이터에 고정된다. ISR은 그 고정을 "주기적 재생성"으로 푼다.
+
 ```mermaid
 sequenceDiagram
     participant CI as 빌드 (npm run build)
@@ -61,8 +63,8 @@ sequenceDiagram
 `export const revalidate = N`(시간 기반)은 ISR의 절반이다. 나머지 절반은 **이벤트 기반 무효화**다.
 
 - **`revalidatePath('/경로')`**: 해당 경로의 정적 캐시를 즉시 무효화한다. **`revalidateTag('태그')`**: `fetch(url, { next: { tags: ['태그'] } })`로 데이터에 태그를 달아두고, 그 태그가 붙은 캐시만 골라서 무효화한다.
-- 전형적 시나리오: CMS에서 글을 발행하면 webhook이 Route Handler(또는 Server Action)를 때리고, 거기서 `revalidateTag('posts')`를 호출한다 — 주기를 기다리지 않고 "발행 즉시" 갱신.
-- 시간 기반과 결정적으로 다른 점: **무효화 후 첫 요청은 stale 응답이 아니라 블로킹 MISS로 새로 렌더된 신선한 HTML을 받는다.** "다음 사람이 새 데이터를 본다"와 함정 1의 "첫 히트는 언제나 stale"은 시간 기반 revalidate에만 해당하는 명제다.
+- 전형적 시나리오: CMS에서 글을 발행하면 webhook이 Route Handler(페이지가 아니라 HTTP 요청 자체를 받아 처리하는 Next의 서버 엔드포인트, `app/**/route.ts`) 또는 Server Action(클라이언트에서 호출할 수 있는 서버 함수 — [11](./11-next-vs-start.md))을 때리고, 거기서 `revalidateTag('posts')`를 호출한다 — 주기를 기다리지 않고 "발행 즉시" 갱신.
+- 시간 기반과 결정적으로 다른 점: **무효화 후 첫 요청은 stale 응답이 아니라 블로킹 MISS로 새로 렌더된 신선한 HTML을 받는다.** 시간 만료는 사본을 "낡았지만 서빙 가능"으로 남겨 두므로 즉시 stale이라도 내보낼 수 있지만, 무효화는 서빙 가능한 사본 자체를 제거한다 — 내보낼 것이 없으니 다음 요청은 렌더가 끝날 때까지 기다릴 수밖에 없다(캐시 어휘로 HIT는 저장된 사본으로 즉시 응답, MISS는 사본이 없어 새로 만들어야 하는 경우 — 이 기다림이 "블로킹" MISS다). "다음 사람이 새 데이터를 본다"와 함정 1의 "첫 히트는 언제나 stale"은 시간 기반 revalidate에만 해당하는 명제다.
 - 이 랩에는 on-demand revalidation 데모가 없다(개념만 소개). 직접 실험하려면 next-lab에 Route Handler를 추가해 볼 것.
 
 ## TanStack Start에서의 대응

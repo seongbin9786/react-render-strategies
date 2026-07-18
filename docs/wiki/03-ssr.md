@@ -6,6 +6,8 @@
 
 ## 동작 원리
 
+서버가 데이터 페치와 렌더를 모두 마친 뒤에야 첫 바이트가 나간다 — 왕복이 3회에서 1회로 줄어 콘텐츠가 HTML에 실려 도착하지만, 그 대가로 TTFB가 데이터 소요 시간을 그대로 떠안는다. 아래 주석의 Suspense는 준비 안 된 하위 트리 자리에 대체 UI를 먼저 그리게 하는 React의 경계 장치인데([05](./05-streaming-ssr.md)에서 상세히 다룬다), 그 경계 없이는 스트리밍 API를 써도 블로킹과 사실상 같다.
+
 ```mermaid
 sequenceDiagram
     participant B as 브라우저
@@ -33,11 +35,15 @@ CSR과의 결정적 차이 두 가지:
 
 ## 유리한 상황
 
+첫 화면을 만드는 비용(데이터 페치+렌더)을 사용자 대신 서버가 내는 것이 SSR이다 — 그 비용을 낼 수 없거나(크롤러, 저사양 기기) 내는 동안 기다리게 하고 싶지 않은(첫 방문 콘텐츠) 상황일수록 유리하다.
+
 - **첫 방문 콘텐츠가 핵심**: 목록/상세/글 — 사용자가 오자마자 봐야 하는 것.
-- **SEO·소셜 미리보기**가 필요한 모든 페이지.
+- **SEO·소셜 미리보기**가 필요한 모든 페이지: 소셜 미리보기 봇은 JS를 실행하지 않고 검색 크롤러도 JS 렌더링은 늦게·불완전하게 처리한다 — 콘텐츠가 HTML 자체에 담겨야 이들이 읽을 수 있다.
 - **느린 기기 + 괜찮은 회선**: 렌더 비용을 서버가 대신 내준다 (단, hydration 비용은 남는다 — [07](./07-hydration.md)).
 
 ## 불리한 상황
+
+매 요청 서버 렌더라는 비용 구조가 이득을 넘어서는 페이지에서 불리하다 — 지연은 사라지지 않고 TTFB로 이동할 뿐이며, hydration 비용은 어차피 남기 때문이다.
 
 - **데이터가 느린 페이지**: TTFB가 데이터에 정비례로 볼모잡힌다. `?apiDelay=2000`이면 흰 화면 2초.
 - **개인화가 없고 갱신이 드문 페이지**: 매 요청 렌더는 낭비 → [04. SSG/ISR](./04-ssg-isr.md).
@@ -57,7 +63,7 @@ CSR과의 결정적 차이 두 가지:
 | Next SSR (to-be) | [http://localhost:3000/csr-vs-ssr/to-be](http://localhost:3000/csr-vs-ssr/to-be) | `fcp` 스냅샷에 이미 콘텐츠가 있음. `apiDelay` 프리셋을 올리면 `ttfb`가 정비례로 밀림 |
 | CSR 대조군 | [http://localhost:3000/csr-vs-ssr/as-is](http://localhost:3000/csr-vs-ssr/as-is) | 같은 지연이 `data-received`에서 나타남 — 지연의 "위치 이동" 관찰 |
 | Next 렌더링 모드 | [http://localhost:3000/rendering-modes/ssr](http://localhost:3000/rendering-modes/ssr) | SSG/ISR과의 TTFB 비교 기준점 |
-| Start 로더 SSR (미러 쌍) | [http://localhost:3001/loader-vs-client/to-be](http://localhost:3001/loader-vs-client/to-be) | route loader가 서버에서 실행됨. Next 방식과의 차이는 [11](./11-next-vs-start.md) |
+| Start 로더 SSR (미러 쌍) | [http://localhost:3001/loader-vs-client/to-be](http://localhost:3001/loader-vs-client/to-be) | route loader(라우트 진입 전에 실행되어 화면 데이터를 준비하는 함수 — 정의는 [09](./09-selective-ssr-and-router-caching.md))가 서버에서 실행됨. Next 방식과의 차이는 [11](./11-next-vs-start.md) |
 
 **실험 순서 제안**: DevTools Network를 `Slow 3G`로 걸고 as-is/to-be를 다시 비교해 보라. 회선이 느릴수록 왕복 횟수 차이(3회 vs 1회)가 지배적이 되어 SSR의 우위가 커진다 — [12. 네트워크 조건](./12-network-conditions.md). 반대로 `hydrated`가 얼마나 늦는지도 함께 보라. SSR의 청구서는 거기에 있다.
 
