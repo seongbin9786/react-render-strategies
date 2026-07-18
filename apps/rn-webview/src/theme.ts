@@ -1,0 +1,20 @@
+// 공통 색상 — 웹 랩과 같은 톤(다크 헤더 + 밝은 본문 + 카드).
+export const C = {
+  headerBg: '#17171c',
+  headerText: '#f2f2f7',
+  headerDim: '#98989d',
+  bg: '#f4f5f7',
+  card: '#ffffff',
+  border: '#e2e2e8',
+  text: '#1c1c21',
+  dim: '#6e6e76',
+  accent: '#4f8ef7',
+  green: '#34c759',
+  red: '#ff453a',
+  orange: '#ff9f0a',
+  purple: '#bf5af2',
+  panelBg: '#141418',
+  panelBorder: '#3a3a3f',
+  panelText: '#f2f2f7',
+  panelDim: '#98989d',
+} as const

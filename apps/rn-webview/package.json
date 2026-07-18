@@ -1,0 +1,28 @@
+{
+  "name": "rn-webview",
+  "version": "1.0.0",
+  "private": true,
+  "description": "renderlab 데모를 RN WebView 안에서 열어 웹 브라우저와 성능을 비교하는 Expo 앱",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@renderlab/mock-data": "file:../../packages/mock-data",
+    "@renderlab/perf": "file:../../packages/perf",
+    "expo": "^57.0.7",
+    "expo-constants": "^57.0.6",
+    "expo-status-bar": "^57.0.1",
+    "react": "19.2.3",
+    "react-native": "^0.86.0",
+    "react-native-webview": "^13.16.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "typescript": "^6.0.3"
+  }
+}

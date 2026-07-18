@@ -1,0 +1,721 @@
+/* react-lab 공용 스타일 — 의존성 없는 일반 CSS 하나로 구성.
+   다크 헤더 + 밝은 본문 + 카드 그리드, 시스템 폰트. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+  background: #f4f5f7;
+  color: #1c1c1e;
+  line-height: 1.55;
+  font-size: 15px;
+}
+
+code,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+a {
+  color: #2456d6;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- 셸 ---------- */
+
+.topbar {
+  background: #14161f;
+  color: #f2f2f7;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.topbar .brand {
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.topbar .brand em {
+  color: #7aa5ff;
+  font-style: normal;
+}
+
+.topbar nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.topbar nav a {
+  color: #c7c9d4;
+  text-decoration: none;
+}
+
+.topbar nav a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+main.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 22px 20px 80px;
+}
+
+/* ---------- 카드/공용 ---------- */
+
+.card {
+  background: #fff;
+  border: 1px solid #e3e4ea;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.hint {
+  color: #6b6e76;
+  font-size: 13px;
+}
+
+.primary-btn {
+  background: #2456d6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #1c46b4;
+}
+
+.big-metric {
+  margin: 12px 0 4px;
+  font-size: 15px;
+}
+
+.big-num {
+  font-size: 34px;
+  font-weight: 800;
+  color: #d6482a;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+input.demo-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #c8cad2;
+  border-radius: 8px;
+}
+
+input.demo-input:focus {
+  outline: 2px solid #7aa5ff;
+  border-color: #2456d6;
+}
+
+/* ---------- DemoLayout 정보 박스 ---------- */
+
+.demo-info {
+  background: #fff;
+  border: 1px solid #e3e4ea;
+  border-left: 6px solid #8e8e93;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+
+.demo-info.kind-as-is {
+  border-left-color: #d6482a;
+}
+
+.demo-info.kind-to-be {
+  border-left-color: #2f9e63;
+}
+
+.demo-info.kind-variant {
+  border-left-color: #b06fd8;
+}
+
+.demo-info-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.demo-info-head h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  color: #fff;
+}
+
+.badge-as-is {
+  background: #d6482a;
+}
+
+.badge-to-be {
+  background: #2f9e63;
+}
+
+.badge-variant {
+  background: #b06fd8;
+}
+
+.strategy-chip {
+  font-size: 12px;
+  background: #eef1f8;
+  color: #37415c;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-weight: 600;
+}
+
+.demo-desc {
+  margin: 10px 0 8px;
+  color: #3a3d46;
+}
+
+.observe-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #6b6e76;
+  letter-spacing: 0.4px;
+  margin: 10px 0 4px;
+}
+
+ul.observe {
+  margin: 0 0 10px;
+  padding-left: 20px;
+  font-size: 13.5px;
+  color: #333640;
+}
+
+ul.observe li {
+  margin: 2px 0;
+}
+
+.demo-links {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  border-top: 1px dashed #e3e4ea;
+  padding-top: 10px;
+}
+
+.demo-links .pair-link {
+  font-weight: 700;
+}
+
+.demo-links .wiki-ref {
+  color: #6b6e76;
+}
+
+/* ---------- 인덱스(카탈로그) ---------- */
+
+.hero {
+  background: linear-gradient(135deg, #1b2340, #232a4d 60%, #2a3560);
+  color: #eef0fa;
+  border-radius: 12px;
+  padding: 24px 24px 20px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.hero p {
+  margin: 6px 0;
+  color: #c6cbe4;
+  max-width: 62rem;
+}
+
+.hero .strategies {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.hero .strategies span {
+  background: rgba(122, 165, 255, 0.16);
+  border: 1px solid rgba(122, 165, 255, 0.4);
+  color: #cfe0ff;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12.5px;
+}
+
+.note-box {
+  background: #fff8e6;
+  border: 1px solid #eadfb2;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  margin-bottom: 20px;
+}
+
+table.catalog {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e3e4ea;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+table.catalog th,
+table.catalog td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid #edeef2;
+  vertical-align: top;
+}
+
+table.catalog th {
+  background: #f0f1f5;
+  font-size: 12.5px;
+  letter-spacing: 0.3px;
+  color: #4b4e58;
+}
+
+table.catalog tr:last-child td {
+  border-bottom: none;
+}
+
+.pair-links a {
+  display: inline-block;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+/* ---------- 스켈레톤 ---------- */
+
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton {
+  background: #e2e3e8;
+  border-radius: 8px;
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.skeleton-card {
+  height: 96px;
+}
+
+.skeleton-line {
+  height: 14px;
+  margin: 8px 0;
+}
+
+.page-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* ---------- 스터디스페이스 카드 (waterfall) ---------- */
+
+.wf-section {
+  margin-bottom: 20px;
+}
+
+.wf-section h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wf-section h3 .status {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b6e76;
+}
+
+.space-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.space-card {
+  background: #fff;
+  border: 1px solid #e3e4ea;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.space-card .chip {
+  height: 46px;
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 12px;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+  font-size: 13px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.space-card .body {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #4b4e58;
+}
+
+/* ---------- transition 데모 ---------- */
+
+.tr-list {
+  margin-top: 14px;
+  max-height: 460px;
+  overflow: auto;
+  border: 1px solid #e3e4ea;
+  border-radius: 10px;
+  background: #fff;
+  transition: opacity 0.15s;
+}
+
+.tr-list.list-dim {
+  opacity: 0.4;
+}
+
+.tr-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tr-list li {
+  padding: 5px 14px;
+  border-bottom: 1px solid #f0f1f4;
+  font-size: 13.5px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tr-list li em {
+  color: #8e8e93;
+  font-style: normal;
+  flex-shrink: 0;
+}
+
+.pending-tag {
+  font-size: 12px;
+  color: #b06f00;
+  font-weight: 700;
+}
+
+/* ---------- memo 데모 ---------- */
+
+.mgrid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.mcard {
+  background: #fff;
+  border: 1px solid #e3e4ea;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mcard-name {
+  font-weight: 700;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mcard-meta {
+  color: #6b6e76;
+}
+
+.mcard-count {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #2456d6;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes card-flash-bg {
+  from {
+    background: #ffd7a1;
+  }
+  to {
+    background: #fff;
+  }
+}
+
+.card-flash {
+  animation: card-flash-bg 0.45s ease-out;
+}
+
+/* ---------- virtual 데모 ---------- */
+
+.vlist {
+  margin-top: 14px;
+  height: 520px;
+  overflow: auto;
+  border: 1px solid #e3e4ea;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.vrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 14px;
+  border-bottom: 1px solid #f0f1f4;
+  font-size: 13.5px;
+}
+
+.row-idx {
+  color: #b0b2ba;
+  width: 52px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.row-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-region {
+  color: #6b6e76;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.row-price {
+  color: #37415c;
+  width: 110px;
+  text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 번들 데모 ---------- */
+
+.bundle-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .bundle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+
+.doc-list button {
+  text-align: left;
+  background: #f4f5f7;
+  border: 1px solid #e3e4ea;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.doc-list button.active {
+  background: #eef1fb;
+  border-color: #2456d6;
+  color: #1c46b4;
+  font-weight: 700;
+}
+
+.doc-main h2 {
+  margin-top: 0;
+}
+
+.doc-raw {
+  background: #f4f5f7;
+  border: 1px dashed #c8cad2;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12.5px;
+  color: #55585f;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 220px;
+  overflow: hidden;
+}
+
+.doc-skeleton {
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6e76;
+  font-size: 14px;
+}
+
+.size-note {
+  margin-top: 14px;
+  font-size: 13px;
+  background: #eef6ef;
+  border: 1px solid #cfe5d4;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #24513a;
+}
+
+/* 마크다운 뷰어 (자체 렌더 결과 전용) */
+
+.doc-view {
+  font-size: 14.5px;
+}
+
+.doc-view pre {
+  background: #10182b;
+  color: #dde3f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.doc-view code {
+  background: #eef0f5;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+
+.doc-view pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.doc-view h1,
+.doc-view h2,
+.doc-view h3 {
+  margin-top: 1.2em;
+}
+
+.doc-view blockquote {
+  border-left: 4px solid #c8cad2;
+  margin: 10px 0;
+  padding: 2px 14px;
+  color: #55585f;
+  background: #f7f8fa;
+}
+
+/* highlight.js 토큰 색 (양쪽 데모 공통 — 외부 테마 CSS 대신 자체 정의로 시각 동등성 보장) */
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  color: #c678dd;
+}
+
+.hljs-string,
+.hljs-regexp {
+  color: #98c379;
+}
+
+.hljs-comment {
+  color: #7f848e;
+  font-style: italic;
+}
+
+.hljs-number {
+  color: #d19a66;
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-title.class_ {
+  color: #61afef;
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-name {
+  color: #e5c07b;
+}
+
+.hljs-built_in,
+.hljs-type {
+  color: #56b6c2;
+}
+
+.hljs-tag {
+  color: #abb2bf;
+}

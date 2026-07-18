@@ -1,0 +1,13 @@
+{
+  "name": "@renderlab/mock-data",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "renderlab 공용 결정적(seed 고정) 목데이터 — 스터디스페이스 도메인",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.next/
+.output/
+.nitro/
+.tanstack/
+.vite/
+.expo/
+*.log
+.DS_Store
+.env*

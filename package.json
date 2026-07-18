@@ -1,0 +1,18 @@
+{
+  "name": "renderlab",
+  "private": true,
+  "version": "0.1.0",
+  "description": "React / Next.js / TanStack Start 렌더링 전략 학습 랩 — as-is/to-be 쌍 데모 + 단계별 성능 계측",
+  "scripts": {
+    "setup": "npm install --no-audit --no-fund && npm --prefix apps/next-lab install --no-audit --no-fund && npm --prefix apps/start-lab install --no-audit --no-fund && npm --prefix apps/react-lab install --no-audit --no-fund",
+    "setup:rn": "npm --prefix apps/rn-webview install --no-audit --no-fund",
+    "dev": "concurrently -k -n next,start,react -c blue,green,magenta \"npm --prefix apps/next-lab run dev\" \"npm --prefix apps/start-lab run dev\" \"npm --prefix apps/react-lab run dev\"",
+    "build": "npm --prefix apps/next-lab run build && npm --prefix apps/start-lab run build && npm --prefix apps/react-lab run build",
+    "start": "concurrently -k -n next,start,react -c blue,green,magenta \"npm --prefix apps/next-lab run start\" \"npm --prefix apps/start-lab run start\" \"npm --prefix apps/react-lab run start\"",
+    "demo": "npm run build && npm run start",
+    "throttle": "node tools/throttle-proxy/index.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
